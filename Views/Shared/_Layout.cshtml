@@ -1,0 +1,170 @@
+﻿@{
+    string controladorActual =
+        ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+
+    string accionActual =
+        ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    string buscarActual =
+        Context.Request.Query["buscar"].ToString();
+
+    bool gestionActiva =
+        controladorActual == "Productos" ||
+        controladorActual == "Categorias";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ProyectoRazorProductos</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/ProyectoRazorProductos.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-uam
+                sticky-top shadow-sm">
+        <div class="container">
+
+            <a class="navbar-brand fw-bold"
+               asp-controller="Home"
+               asp-action="Index">
+                Sistema de Productos
+            </a>
+
+            <button class="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#menuPrincipal"
+                    aria-controls="menuPrincipal"
+                    aria-expanded="false"
+                    aria-label="Mostrar u ocultar navegación">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse"
+                 id="menuPrincipal">
+
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <a class="nav-link
+                           @(controladorActual == "Home" &&
+                             accionActual == "Index" ? "active" : "")"
+                           aria-current="@(controladorActual == "Home" &&
+                             accionActual == "Index" ? "page" : null)"
+                           asp-controller="Home"
+                           asp-action="Index">
+                            Inicio
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link
+                           @(controladorActual == "Productos" ? "active" : "")"
+                           aria-current="@(controladorActual == "Productos"
+                             ? "page" : null)"
+                           asp-controller="Productos"
+                           asp-action="Index">
+                            Productos
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link
+                           @(controladorActual == "Categorias" ? "active" : "")"
+                           aria-current="@(controladorActual == "Categorias"
+                             ? "page" : null)"
+                           asp-controller="Categorias"
+                           asp-action="Index">
+                            Categorías
+                        </a>
+                    </li>
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle
+                           @(gestionActiva ? "active" : "")"
+                           href="#"
+                           role="button"
+                           data-bs-toggle="dropdown"
+                           aria-expanded="false">
+                            Gestión
+                        </a>
+
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item"
+                                   asp-controller="Productos"
+                                   asp-action="Create">
+                                    Nuevo producto
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item"
+                                   asp-controller="Categorias"
+                                   asp-action="Create">
+                                    Nueva categoría
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <a class="dropdown-item disabled"
+                                   aria-disabled="true">
+                                    Reportes — próximamente
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <form class="d-flex mt-3 mt-lg-0"
+                      role="search"
+                      method="get"
+                      asp-controller="Productos"
+                      asp-action="Index">
+
+                    <input class="form-control me-2 buscador-navbar"
+                           type="search"
+                           name="buscar"
+                           value="@buscarActual"
+                           placeholder="Buscar productos"
+                           aria-label="Buscar productos" />
+
+                    <button class="btn btn-outline-light"
+                            type="submit">
+                        Buscar
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    </nav>
+</header>
+
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2026 - ProyectoRazorProductos -
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">
+                Privacy
+            </a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

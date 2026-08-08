@@ -1,0 +1,32 @@
+﻿@model ProyectoRazorProductos.Models.Producto
+
+@{
+    ViewData["Title"] = "Eliminar producto";
+}
+<nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a asp-controller="Home" asp-action="Index">Inicio</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a asp-controller="Productos" asp-action="Index">
+                Productos
+            </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Eliminar
+        </li>
+    </ol>
+</nav>
+
+<h1>Eliminar producto</h1>
+
+<div class="alert alert-danger">
+    ¿Está seguro de eliminar el producto <strong>@Model.Nombre</strong>?
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

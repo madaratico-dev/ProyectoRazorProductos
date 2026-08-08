@@ -1,0 +1,43 @@
+﻿@model Producto
+
+<tr>
+    <td>
+        <strong>@Model.Nombre</strong>
+        <div class="text-muted small">@Model.Descripcion</div>
+    </td>
+
+    <td>@Model.Precio.ToString("C")</td>
+
+    <td>
+        @if (Model.Activo)
+        {
+            <span class="badge bg-success">Activo</span>
+        }
+        else
+        {
+            <span class="badge bg-secondary">Inactivo</span>
+        }
+    </td>
+
+    <td>@Model.FechaCreacion.ToShortDateString()</td>
+
+    <td class="text-end">
+        <a asp-action="Details"
+           asp-route-id="@Model.Id"
+           class="btn btn-sm btn-info">
+            Ver
+        </a>
+
+        <a asp-action="Edit"
+           asp-route-id="@Model.Id"
+           class="btn btn-sm btn-warning">
+            Editar
+        </a>
+
+        <a asp-action="Delete"
+           asp-route-id="@Model.Id"
+           class="btn btn-sm btn-danger">
+            Eliminar
+        </a>
+    </td>
+</tr>
