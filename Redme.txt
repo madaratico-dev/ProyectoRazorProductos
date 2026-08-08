@@ -1,0 +1,293 @@
+# Proyecto Razor Productos
+
+Aplicación web desarrollada en ASP.NET Core MVC (.NET 9) para la administración de productos y categorías.
+
+---
+
+# Características
+
+- CRUD de Categorías.
+- CRUD de Productos.
+- Entity Framework Core 9.
+- SQL Server.
+- Docker.
+- Pruebas unitarias con xUnit.
+- Integración continua con GitHub Actions.
+
+---
+
+# Tecnologías utilizadas
+
+- ASP.NET Core MVC (.NET 9)
+- Entity Framework Core 9
+- SQL Server
+- Docker
+- Docker Compose
+- xUnit
+- Git
+- GitHub Actions
+
+---
+
+# Requisitos
+
+Antes de ejecutar el proyecto debe tener instalado:
+
+- Visual Studio 2022 (17.14 o superior)
+- .NET SDK 9
+- SQL Server
+- Docker Desktop
+- Git
+
+---
+
+# Clonar el repositorio
+
+```bash
+git clone https://github.com/madaratico-dev/ProyectoRazorProductos.git
+cd ProyectoRazorProductos
+```
+
+---
+
+# Restaurar dependencias
+
+```bash
+dotnet restore
+```
+
+---
+
+# Compilar el proyecto
+
+```bash
+dotnet build
+```
+
+---
+
+# Ejecutar el proyecto
+
+Desde Visual Studio:
+
+- Abrir la solución.
+- Presionar **F5**.
+
+O desde la terminal:
+
+```bash
+dotnet run
+```
+
+---
+
+# Base de datos
+
+Modificar la cadena de conexión en:
+
+```
+appsettings.json
+```
+
+Ejemplo:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=SERVIDOR;Database=ProyectoProductos;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+```
+
+Aplicar las migraciones:
+
+```bash
+dotnet ef database update
+```
+
+---
+
+# Docker
+
+Construir y levantar los contenedores:
+
+```bash
+docker compose up --build
+```
+
+Detener los contenedores:
+
+```bash
+docker compose down
+```
+
+---
+
+# Pruebas unitarias
+
+Ejecutar todas las pruebas:
+
+```bash
+dotnet test
+```
+
+Las pruebas verifican:
+
+- Producto sin nombre.
+- Producto con precio inválido.
+- Producto válido.
+
+---
+
+# Flujo de compilación recomendado
+
+Durante el desarrollo se recomienda utilizar los siguientes comandos:
+
+Restaurar paquetes:
+
+```bash
+dotnet restore
+```
+
+Compilar:
+
+```bash
+dotnet build
+```
+
+Ejecutar pruebas:
+
+```bash
+dotnet test
+```
+
+Ejecutar la aplicación:
+
+```bash
+dotnet run
+```
+
+Si se utiliza Docker:
+
+```bash
+docker compose up --build
+```
+
+Para detener los contenedores:
+
+```bash
+docker compose down
+```
+
+---
+
+# Comandos Git
+
+Verificar el estado del repositorio:
+
+```bash
+git status
+```
+
+Crear una nueva rama:
+
+```bash
+git checkout -b nombre-rama
+```
+
+Cambiar de rama:
+
+```bash
+git checkout nombre-rama
+```
+
+Actualizar la rama principal:
+
+```bash
+git checkout main
+git pull origin main
+```
+
+Agregar cambios:
+
+```bash
+git add .
+```
+
+Crear un commit:
+
+```bash
+git commit -m "Descripción del cambio"
+```
+
+Subir cambios al repositorio:
+
+```bash
+git push origin nombre-rama
+```
+
+Crear una rama remota por primera vez:
+
+```bash
+git push -u origin nombre-rama
+```
+
+Ver ramas:
+
+```bash
+git branch
+```
+
+Ver ramas remotas:
+
+```bash
+git branch -r
+```
+
+Ver todas las ramas:
+
+```bash
+git branch -a
+```
+
+---
+
+# Integración Continua (CI)
+
+El proyecto utiliza **GitHub Actions**.
+
+Cada Pull Request hacia la rama **main** ejecuta automáticamente:
+
+- Restauración de dependencias.
+- Compilación del proyecto.
+- Ejecución de pruebas unitarias.
+
+El workflow se encuentra en:
+
+```
+.github/workflows/dotnet.yml
+```
+
+---
+
+# Estructura del proyecto
+
+```
+ProyectoRazorProductos
+│
+├── Controllers
+├── Data
+├── Models
+├── Services
+├── Views
+├── wwwroot
+├── Tests
+├── Dockerfile
+├── docker-compose.yml
+├── ProyectoRazorProductos.sln
+└── README.md
+```
+
+---
+
+# Autor
+
+**Pablo Salas**
