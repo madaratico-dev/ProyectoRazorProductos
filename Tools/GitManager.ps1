@@ -229,31 +229,78 @@ while ($true)
 "9"
 {
     Write-Host ""
+    Write-Host "RECONSTRUYENDO EL PROYECTO..." -ForegroundColor Yellow
+    Write-Host ""
 
-    dotnet build
+    Push-Location (Join-Path $PSScriptRoot "..")
 
-    if($LASTEXITCODE -eq 0)
+    Write-Host "DETENIENDO CONTENEDORES..." -ForegroundColor Cyan
+    docker compose down --remove-orphans
+
+    Write-Host ""
+    Write-Host "ELIMINANDO CONTENEDORES..." -ForegroundColor Cyan
+
+    docker rm -f sqlserver 2>$null | Out-Null
+    docker rm -f proyectorazorproductos 2>$null | Out-Null
+
+    Write-Host ""
+    Write-Host "RECONSTRUYENDO EL PROYECTO..." -ForegroundColor Cyan
+
+    docker compose up --build -d
+
+    if ($LASTEXITCODE -eq 0)
     {
         Write-Host ""
-        Write-Host "PROYECTO COMPILADO CORRECTAMENTE." -ForegroundColor Green
+        Write-Host "ESPERANDO QUE LA APLICACION INICIE..." -ForegroundColor Cyan
+
+        Start-Sleep -Seconds 15
+
+        Write-Host ""
+        Write-Host "VERIFICANDO CONTENEDORES..." -ForegroundColor Cyan
+        docker ps
+
+        Write-Host ""
+        Write-Host "ABRIENDO NAVEGADOR..." -ForegroundColor Cyan
+        Start-Process "http://localhost:8080"
+
+        Write-Host ""
+        Write-Host "PROYECTO RECONSTRUIDO CORRECTAMENTE." -ForegroundColor Green
     }
     else
     {
         Write-Host ""
-        Write-Host "ERROR AL COMPILAR EL PROYECTO." -ForegroundColor Red
+        Write-Host "ERROR AL RECONSTRUIR EL PROYECTO." -ForegroundColor Red
     }
+
+    Pop-Location
 }
 "10"
 {
     Write-Host ""
 
-    dotnet test
+$Tests = Join-Path $PSScriptRoot "..\Tests\Tests.csproj"
+
+dotnet test $Tests
 }
 "11"
 {
     Write-Host ""
+    Write-Host "INICIANDO PROYECTO..." -ForegroundColor Yellow
+    Write-Host ""
 
-    dotnet run
+    $Proyecto = Join-Path $PSScriptRoot "..\ProyectoRazorProductos.csproj"
+
+    Start-Job -ScriptBlock {
+        param($Proyecto)
+        dotnet run --project $Proyecto
+    } -ArgumentList $Proyecto | Out-Null
+
+    Start-Sleep -Seconds 5
+
+    Start-Process "http://localhost:5250"
+
+    Write-Host ""
+    Write-Host "PROYECTO EJECUTANDOSE EN EL NAVEGADOR." -ForegroundColor Green
 }
 "12"
 {
