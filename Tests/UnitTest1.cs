@@ -8,6 +8,7 @@ namespace Tests;
 public class UnitTest1
 {
     [Fact]
+    //Metodo de prueba para validar que un producto sin nombre es inválido
     public void ProductoSinNombreDebeSerInvalido()
     {
         // Arrange
@@ -35,6 +36,7 @@ public class UnitTest1
     }
 
     [Fact]
+    //Metodo de prueba para validar que un producto con precio menor a cero es inválido
     public void ProductoConPrecioMenorACeroDebeSerInvalido()
     {
         // Arrange
@@ -62,6 +64,7 @@ public class UnitTest1
     }
 
     [Fact]
+    //Metodo de prueba para validar que un producto válido pasa las validaciones
     public void ProductoValidoDebePasarLasValidaciones()
     {
         // Arrange
