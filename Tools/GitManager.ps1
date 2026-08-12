@@ -7,20 +7,17 @@ function MostrarMenu
     Write-Host "==========================================" -ForegroundColor Cyan
     Write-Host ""
 
-    Write-Host "1. DESCARGAR ULTIMOS CAMBIOS"
-    Write-Host "2. CREAR NUEVA RAMA"
-    Write-Host "3. CAMBIAR DE RAMA"
-    Write-Host "4. VER RAMAS"
-    Write-Host "5. VER ESTADO"
-    Write-Host "6. AGREGAR CAMBIOS"
-    Write-Host "7. CREAR COMMIT"
-    Write-Host "8. SUBIR CAMBIOS"
-    Write-Host "9. COMPILAR PROYECTO"
-    Write-Host "10. EJECUTAR PRUEBAS"
-    Write-Host "11. EJECUTAR PROYECTO"
-    Write-Host "12. ABRIR VISUAL STUDIO"
-    Write-Host "13. SALIR"
-    Write-Host ""
+Write-Host "1. DESCARGAR ULTIMOS CAMBIOS"
+Write-Host "2. CREAR NUEVA RAMA"
+Write-Host "3. CAMBIAR DE RAMA"
+Write-Host "4. VER RAMAS"
+Write-Host "5. VER ESTADO"
+Write-Host "6. GUARDAR CAMBIOS (ADD + COMMIT + PUSH)"
+Write-Host "7. RECONSTRUIR PROYECTO DOCKER"
+Write-Host "8. EJECUTAR PRUEBAS"
+Write-Host "9. EJECUTAR PROYECTO"
+Write-Host "10. ABRIR VISUAL STUDIO"
+Write-Host "11. SALIR"
 }
 
 while ($true)
@@ -34,74 +31,121 @@ while ($true)
 
     switch ($opcion)
     {
-    "1"
+"1"
+{
+    Write-Host ""
+    Write-Host "VERIFICANDO CAMBIOS LOCALES..." -ForegroundColor Yellow
+    Write-Host ""
+
+    $Cambios = git status --porcelain
+
+    if ($Cambios)
     {
         Write-Host ""
-        Write-Host "DESCARGANDO ULTIMOS CAMBIOS..." -ForegroundColor Yellow
-        Write-Host ""
-
-        git pull
-
-        if ($LASTEXITCODE -eq 0)
-        {
-            Write-Host ""
-            Write-Host "PROYECTO ACTUALIZADO CORRECTAMENTE." -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host ""
-            Write-Host "OCURRIO UN ERROR AL ACTUALIZAR EL PROYECTO." -ForegroundColor Red
-        }
+        Write-Host "EXISTEN CAMBIOS SIN GUARDAR." -ForegroundColor Yellow
+        Write-Host "UTILICE LA OPCION 6 PARA GUARDAR LOS CAMBIOS ANTES DE ACTUALIZAR." -ForegroundColor Yellow
+        break
     }
 
-    "2"
+    Write-Host ""
+    Write-Host "DESCARGANDO ULTIMOS CAMBIOS..." -ForegroundColor Yellow
+    Write-Host ""
+
+    git pull --rebase
+
+    if ($LASTEXITCODE -eq 0)
     {
         Write-Host ""
-
-        $NombreRama = Read-Host "INGRESE EL NOMBRE DE LA NUEVA RAMA"
-
-        if ([string]::IsNullOrWhiteSpace($NombreRama))
-        {
-            Write-Host ""
-            Write-Host "EL NOMBRE DE LA RAMA NO PUEDE ESTAR VACIO." -ForegroundColor Red
-        }
-        else
-        {
-            Write-Host ""
-            Write-Host "CREANDO RAMA..." -ForegroundColor Yellow
-            Write-Host ""
-
-            git checkout -b $NombreRama
-
-            if ($LASTEXITCODE -eq 0)
-            {
-                git push -u origin $NombreRama
-
-                if ($LASTEXITCODE -eq 0)
-                {
-                    Write-Host ""
-                    Write-Host "RAMA CREADA CORRECTAMENTE." -ForegroundColor Green
-                }
-                else
-                {
-                    Write-Host ""
-                    Write-Host "LA RAMA SE CREO LOCALMENTE, PERO NO SE PUDO SUBIR A GITHUB." -ForegroundColor Red
-                }
-            }
-            else
-            {
-                Write-Host ""
-                Write-Host "NO SE PUDO CREAR LA RAMA." -ForegroundColor Red
-            }
-        }
+        Write-Host "PROYECTO ACTUALIZADO CORRECTAMENTE." -ForegroundColor Green
     }
+    else
+    {
+        Write-Host ""
+        Write-Host "OCURRIO UN ERROR AL ACTUALIZAR EL PROYECTO." -ForegroundColor Red
+    }
+}
+
+   "2"
+{
+    Write-Host ""
+
+    $NombreRama = Read-Host "INGRESE EL NOMBRE DE LA NUEVA RAMA"
+
+    if ([string]::IsNullOrWhiteSpace($NombreRama))
+    {
+        Write-Host ""
+        Write-Host "EL NOMBRE DE LA RAMA NO PUEDE ESTAR VACIO." -ForegroundColor Red
+        break
+    }
+
+    # LIMPIAR EL NOMBRE DE LA RAMA
+    $NombreRama = $NombreRama.Trim()
+
+    $NombreRama = $NombreRama `
+        -replace '[·‡‰‚]','a' `
+        -replace '[ÈËÎÍ]','e' `
+        -replace '[ÌÏÔÓ]','i' `
+        -replace '[ÛÚˆÙ]','o' `
+        -replace '[˙˘¸˚]','u' `
+        -replace '[Ò]','n' `
+        -replace '[¡¿ƒ¬]','A' `
+        -replace '[…»À ]','E' `
+        -replace '[ÕÃœŒ]','I' `
+        -replace '[”“÷‘]','O' `
+        -replace '[⁄Ÿ‹€]','U' `
+        -replace '[—]','N'
+
+    # REEMPLAZAR ESPACIOS POR GUIONES
+    $NombreRama = $NombreRama -replace '\s+','-'
+
+    # ELIMINAR CARACTERES INVALIDOS
+    $NombreRama = $NombreRama -replace '[^a-zA-Z0-9/_-]',''
+
+    # CONVERTIR A MINUSCULAS
+    $NombreRama = $NombreRama.ToLower()
+
+    Write-Host ""
+    Write-Host "NOMBRE FINAL DE LA RAMA: $NombreRama" -ForegroundColor Cyan
+    Write-Host ""
+
+    Write-Host "CREANDO RAMA..." -ForegroundColor Yellow
+    Write-Host ""
+
+    git checkout -b $NombreRama
+
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Host ""
+        Write-Host "NO SE PUDO CREAR LA RAMA." -ForegroundColor Red
+        break
+    }
+
+    git push -u origin $NombreRama
+
+    if ($LASTEXITCODE -eq 0)
+    {
+        Write-Host ""
+        Write-Host "RAMA CREADA Y SUBIDA CORRECTAMENTE." -ForegroundColor Green
+    }
+    else
+    {
+        Write-Host ""
+        Write-Host "LA RAMA SE CREO LOCALMENTE, PERO NO SE PUDO SUBIR A GITHUB." -ForegroundColor Red
+    }
+}
 	"3"
 {
+    Write-Host ""
+    Write-Host "ACTUALIZANDO INFORMACION..." -ForegroundColor Yellow
+    Write-Host ""
+
+    git fetch
+
     Write-Host ""
     Write-Host "RAMAS DISPONIBLES:" -ForegroundColor Cyan
     Write-Host ""
 
-    git branch -av
+    git branch
 
     Write-Host ""
 
@@ -111,25 +155,34 @@ while ($true)
     {
         Write-Host ""
         Write-Host "EL NOMBRE DE LA RAMA NO PUEDE ESTAR VACIO." -ForegroundColor Red
+        break
+    }
+
+    $Cambios = git status --porcelain
+
+    if ($Cambios)
+    {
+        Write-Host ""
+        Write-Host "EXISTEN CAMBIOS SIN GUARDAR." -ForegroundColor Yellow
+        Write-Host "UTILICE LA OPCION 6 PARA GUARDARLOS ANTES DE CAMBIAR DE RAMA." -ForegroundColor Yellow
+        break
+    }
+
+    Write-Host ""
+    Write-Host "CAMBIANDO DE RAMA..." -ForegroundColor Yellow
+    Write-Host ""
+
+    git checkout $NombreRama
+
+    if ($LASTEXITCODE -eq 0)
+    {
+        Write-Host ""
+        Write-Host "SE CAMBIO A LA RAMA CORRECTAMENTE." -ForegroundColor Green
     }
     else
     {
         Write-Host ""
-        Write-Host "CAMBIANDO DE RAMA..." -ForegroundColor Yellow
-        Write-Host ""
-
-        git checkout $NombreRama
-
-        if ($LASTEXITCODE -eq 0)
-        {
-            Write-Host ""
-            Write-Host "SE CAMBIO A LA RAMA CORRECTAMENTE." -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host ""
-            Write-Host "NO SE PUDO CAMBIAR DE RAMA." -ForegroundColor Red
-        }
+        Write-Host "NO SE PUDO CAMBIAR DE RAMA." -ForegroundColor Red
     }
 }
 
@@ -145,7 +198,7 @@ while ($true)
     Write-Host "RAMAS DISPONIBLES:" -ForegroundColor Cyan
     Write-Host ""
 
-    git branch -av
+git branch
 }
 
    "5"
@@ -157,76 +210,74 @@ while ($true)
     git status
 }
 
-
 "6"
 {
     Write-Host ""
-    Write-Host "AGREGANDO CAMBIOS..." -ForegroundColor Yellow
+    Write-Host "PREPARANDO CAMBIOS..." -ForegroundColor Yellow
     Write-Host ""
 
     git add .
 
-    if ($LASTEXITCODE -eq 0)
-    {
-        Write-Host ""
-        Write-Host "CAMBIOS AGREGADOS CORRECTAMENTE." -ForegroundColor Green
-    }
-    else
+    if ($LASTEXITCODE -ne 0)
     {
         Write-Host ""
         Write-Host "NO SE PUDIERON AGREGAR LOS CAMBIOS." -ForegroundColor Red
+        break
     }
-}
-"7"
-{
-    Write-Host ""
 
-    $Mensaje = Read-Host "INGRESE EL MENSAJE DEL COMMIT"
+    $Cambios = git status --porcelain
 
-    if([string]::IsNullOrWhiteSpace($Mensaje))
+    if ([string]::IsNullOrWhiteSpace($Cambios))
     {
         Write-Host ""
-        Write-Host "EL MENSAJE NO PUEDE ESTAR VACIO." -ForegroundColor Red
+        Write-Host "NO EXISTEN CAMBIOS PARA REALIZAR EL COMMIT." -ForegroundColor Yellow
+        break
     }
-    else
-    {
-        git commit -m "$Mensaje"
 
-        if($LASTEXITCODE -eq 0)
-        {
-            Write-Host ""
-            Write-Host "COMMIT CREADO CORRECTAMENTE." -ForegroundColor Green
-        }
-        else
-        {
-            Write-Host ""
-            Write-Host "NO SE PUDO CREAR EL COMMIT." -ForegroundColor Red
-        }
-    }
-}
-"8"
-{
     Write-Host ""
+    $Mensaje = Read-Host "INGRESE EL MENSAJE DEL COMMIT"
+
+    if ([string]::IsNullOrWhiteSpace($Mensaje))
+    {
+        Write-Host ""
+        Write-Host "EL MENSAJE DEL COMMIT NO PUEDE ESTAR VACIO." -ForegroundColor Red
+        break
+    }
+
+    Write-Host ""
+    Write-Host "CREANDO COMMIT..." -ForegroundColor Yellow
+    Write-Host ""
+
+    git commit -m "$Mensaje"
+
+    if ($LASTEXITCODE -ne 0)
+    {
+        Write-Host ""
+        Write-Host "NO SE PUDO CREAR EL COMMIT." -ForegroundColor Red
+        break
+    }
 
     $RamaActual = git branch --show-current
 
-    Write-Host "SUBIENDO CAMBIOS A $RamaActual..." -ForegroundColor Yellow
+    Write-Host ""
+    Write-Host "SUBIENDO CAMBIOS A GITHUB..." -ForegroundColor Yellow
     Write-Host ""
 
     git push origin $RamaActual
 
-    if($LASTEXITCODE -eq 0)
+    if ($LASTEXITCODE -eq 0)
     {
         Write-Host ""
-        Write-Host "CAMBIOS SUBIDOS CORRECTAMENTE." -ForegroundColor Green
+        Write-Host "COMMIT Y PUSH REALIZADOS CORRECTAMENTE." -ForegroundColor Green
     }
     else
     {
         Write-Host ""
-        Write-Host "NO SE PUDIERON SUBIR LOS CAMBIOS." -ForegroundColor Red
+        Write-Host "EL COMMIT SE CREO, PERO OCURRIO UN ERROR AL SUBIR LOS CAMBIOS." -ForegroundColor Red
     }
 }
-"9"
+
+"7"
 {
     Write-Host ""
     Write-Host "RECONSTRUYENDO EL PROYECTO..." -ForegroundColor Yellow
@@ -274,7 +325,7 @@ while ($true)
 
     Pop-Location
 }
-"10"
+"8"
 {
     Write-Host ""
 
@@ -282,33 +333,24 @@ $Tests = Join-Path $PSScriptRoot "..\Tests\Tests.csproj"
 
 dotnet test $Tests
 }
-"11"
+"9"
 {
     Write-Host ""
-    Write-Host "INICIANDO PROYECTO..." -ForegroundColor Yellow
-    Write-Host ""
 
-    $Proyecto = Join-Path $PSScriptRoot "..\ProyectoRazorProductos.csproj"
+    Write-Host "ABRIENDO LA APLICACION..." -ForegroundColor Yellow
 
-    Start-Job -ScriptBlock {
-        param($Proyecto)
-        dotnet run --project $Proyecto
-    } -ArgumentList $Proyecto | Out-Null
-
-    Start-Sleep -Seconds 5
-
-    Start-Process "http://localhost:5250"
+    Start-Process "http://localhost:8080"
 
     Write-Host ""
-    Write-Host "PROYECTO EJECUTANDOSE EN EL NAVEGADOR." -ForegroundColor Green
+    Write-Host "APLICACION ABIERTA." -ForegroundColor Green
 }
-"12"
+"10"
 {
     Write-Host ""
 
     Start-Process "..\ProyectoRazorProductos.sln"
 }
-"13"
+"11"
 {
     break
 }
